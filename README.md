@@ -11,6 +11,12 @@ A collection of Python scripts to fully automate 1st and 3rd-party campaign repo
 | `dcm_report.py`     | Merges all 3rd-party reports (e.g., DCM) into a single report.              |
 | `3p_report.py`      | Matches creative data from Beeswax with 3P data and generates final report. |
 
+# Notes:
+- All scripts are built for Python 3.x.
+- Modify file paths as needed depending on your working environment.
+- Merge logic is based on matching placement ID and date.
+- Beeswax creative names are mapped to standardized formats (MO, CTV, DE, etc.). This is company specific taxanomy formats.
+
 ### Install dependencies (required libraries)
 pip install -r requirements.txt
 
