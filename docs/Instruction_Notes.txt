@@ -1,0 +1,27 @@
+#1 - beeswax_report.py
+
+Run this script to download beeswax performance report.
+Use Beeswax_report_input.env to input the timezones & their start date specify.
+
+#2 - beeswax_filter.py
+
+Run this script to get the latest data from beeswax api for 3p_mapping. This should run within 2-10mins.
+You can filter by end date in campaign & line_item level.
+
+#3 - dcm_report.py
+
+Run this script to merge all the individual dcm/any 3p reports into a single report, based on placement ID & date.
+Check if placement id & date is present in all of the reports (once for every new report getting added).
+
+#4 - 3p_report.py
+
+Run this script to merge the data from beeswax creative name in beeswax_filtered_report & merged_dcm_report.
+This basically assigns a name to every placement name in merged_report to a custom name based on the creative name in beeswax.
+
+# Installation:
+
+Install this below packages before running the script with python 3.+ versions.
+
+pip install pandas requests python-dotenv pytz
+
+-- paste the above in terminal.
