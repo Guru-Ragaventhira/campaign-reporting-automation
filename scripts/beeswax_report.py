@@ -1,3 +1,5 @@
+"""Downloads Beeswax performance report based on timezone and date inputs."""
+
 import requests
 import pandas as pd
 import time
