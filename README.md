@@ -22,8 +22,8 @@ pip install -r requirements.txt
 
 ## Folder Structure
 - scripts/ # All main automation scripts 
- config/ # .env config files with API keys, user info, etc. 
- docs/ # Instruction notes or documentation 
+- config/ # .env config files with API keys, user info, etc. 
+- docs/ # Instruction notes or documentation 
 -> requirements.txt # Python packages needed to run the scripts
 
 ''' edit the config to "input_folder" to match with the scripts.'''
