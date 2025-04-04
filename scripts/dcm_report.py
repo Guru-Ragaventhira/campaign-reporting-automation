@@ -1,3 +1,5 @@
+"""Merges all 3rd-party reports (e.g., DCM) into a single report based on placement ID and date."""
+
 import pandas as pd
 import os
 import logging
