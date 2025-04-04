@@ -1,3 +1,5 @@
+"""Filters latest campaign and line item data from Beeswax API (used for 3P mapping)."""
+
 import requests
 import csv
 import time
