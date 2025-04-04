@@ -14,3 +14,4 @@ A collection of Python scripts to fully automate 1st and 3rd-party campaign repo
 ### Install dependencies (required libraries)
 pip install -r requirements.txt
 
+''' edit the config to "input_folder" to match with the scripts.'''
