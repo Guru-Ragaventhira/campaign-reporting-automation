@@ -1,5 +1,3 @@
-"""Downloads Beeswax performance report based on timezone and date inputs."""
-
 import requests
 import pandas as pd
 import time
@@ -393,6 +391,98 @@ def merge_reports(report_name, timezone=None):
 
     return merged_file_path
 
+def process_spend_reports():
+    """Process merged Spend reports to add FirstParty_name column."""
+    print("🔄 Processing merged Spend reports to add FirstParty_name column...")
+    
+    # Process each spend report for each timezone
+    for timezone in TIMEZONES_SPEND:
+        # Include timezone in file name if specified
+        tz_suffix = f"_tz_{timezone.replace('/', '_')}" if timezone else ""
+        
+        merged_file_name = f"Beeswax_Spend{tz_suffix}_{today.replace('-', '')}.csv"
+        merged_file_path = os.path.join(data_folder, merged_file_name)
+        
+        # Check if merged file exists
+        if not os.path.exists(merged_file_path):
+            print(f"⚠️ Merged Spend report not found for timezone {timezone}. Skipping processing.")
+            continue
+            
+        try:
+            # Read the merged report
+            df = pd.read_csv(merged_file_path)
+            
+            print(f"📋 Columns in {merged_file_name}: {df.columns.tolist()}")
+            
+            # We see the columns are exactly 'Line Item Name' and 'Campaign Name', so let's use those directly
+            line_item_col = 'Line Item Name'
+            campaign_col = 'Campaign Name'
+            day_col = 'Day'  # The column is named 'Day' instead of 'bid_day'
+            
+            # Check if these columns exist in the dataframe
+            if line_item_col not in df.columns or campaign_col not in df.columns:
+                print(f"⚠️ Required columns not found in report. Columns available: {df.columns.tolist()}")
+                continue
+                
+            # Add FirstParty_name column based on line_item_name
+            df['FirstParty_name'] = df.apply(
+                lambda row: create_first_party_name(row[line_item_col], row[campaign_col]), 
+                axis=1
+            )
+            
+            # Reorder columns to put FirstParty_name before Day
+            if day_col in df.columns:
+                cols = df.columns.tolist()
+                day_idx = cols.index(day_col)
+                cols.remove('FirstParty_name')
+                cols.insert(day_idx, 'FirstParty_name')
+                df = df[cols]
+            
+            # Save the processed report with "_processed" suffix
+            processed_file_name = merged_file_name.replace('.csv', '_processed.csv')
+            processed_file_path = os.path.join(data_folder, processed_file_name)
+            df.to_csv(processed_file_path, index=False)
+            
+            print(f"✅ Processed Spend report saved as {processed_file_path}")
+            
+            # Create a backup copy
+            backup_file_path = os.path.join(backup_folder, processed_file_name)
+            df.to_csv(backup_file_path, index=False)
+            print(f"✅ Backup copy saved to {backup_file_path}")
+            
+        except Exception as e:
+            print(f"❌ Error processing Spend report for timezone {timezone}: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+
+def create_first_party_name(line_item_name, campaign_name):
+    """Create FirstParty_name based on line_item_name patterns."""
+    # Default to Unknown if line_item_name is not available
+    if pd.isna(line_item_name) or line_item_name == "":
+        return "Unknown"
+    
+    # Convert to string in case it's not already
+    line_item_name = str(line_item_name)
+    
+    # Determine line_item_type
+    line_item_type = (
+        "Mobile" if line_item_name.startswith("MO") else
+        "Desktop" if line_item_name.startswith("DE_") else
+        "CTV" if line_item_name.startswith("CTV_") else "Unknown"
+    )
+    
+    # Determine line_item_format
+    line_item_format = (
+        "Banner" if "_BA_" in line_item_name or "_RM_" in line_item_name else
+        "Video" if "_VI_" in line_item_name else "Unknown"
+    )
+    
+    # Default to "Unknown" if campaign_name is not available
+    campaign_name = "Unknown" if pd.isna(campaign_name) or campaign_name == "" else str(campaign_name)
+    
+    # Create FirstParty_name
+    return f"{campaign_name}_{line_item_type}_{line_item_format}"
+
 def main():
     start_time = time.time()
     print("🚀 Starting Beeswax API Automation...")
@@ -423,11 +513,14 @@ def main():
                         print(f"✅ Merged report created for {report_name} [TZ: {timezone}]")
                     else:
                         print(f"⚠️ Merging failed for {report_name} [TZ: {timezone}]")
+        
+        # After all reports have been downloaded and merged, process Spend reports
+        process_spend_reports()
 
     end_time = time.time()
     total_time = end_time - start_time
     minutes, seconds = divmod(total_time, 60)
     print(f"🎯 Script execution completed in {int(minutes)} minutes and {int(seconds)} seconds!")
-
+    
 if __name__ == "__main__":
     main()

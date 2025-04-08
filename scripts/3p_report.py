@@ -1,5 +1,3 @@
-"""Matches creative data from Beeswax with 3rd-party data and generates the final unified report."""
-
 import os
 import pandas as pd
 import time
@@ -76,7 +74,7 @@ def process_reports():
         if not matched_rows.empty:
             for _, beeswax_row in matched_rows.iterrows():
                 creative_name = beeswax_row.get("creative_creative_name", "Unknown")
-                campaign_id = beeswax_row.get("campaign_campaign_id", "Unknown")
+                campaign_name = beeswax_row.get("campaign_campaign_name", "Unknown")
 
                 creative_type = (
                     "Mobile" if creative_name.startswith("MO") else
@@ -89,7 +87,7 @@ def process_reports():
                     "Video" if "_VI_" in creative_name else "Unknown"
                 )
 
-                bees_name = f"{campaign_id}_{creative_type}_{creative_format}"
+                bees_name = f"{campaign_name}_{creative_type}_{creative_format}"
                 results.append([placement_id, bees_name, dcm_date, dcm_impressions, dcm_clicks, dcm_video_completions])
         else:
             results.append([placement_id, "Placement ID not found in Beeswax", dcm_date, dcm_impressions, dcm_clicks, dcm_video_completions])
