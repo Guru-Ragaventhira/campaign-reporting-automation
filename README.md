@@ -35,3 +35,4 @@ pip install -r requirements.txt
 3. Add `.env` files to the `config/` folder (format already provided)
 4. Run the script using:  
    `python scripts/beeswax_report.py`
+all necessary scripts as you need.
